@@ -1,0 +1,48 @@
+--- libsrc/D2LAppContext.php	(revision 850)
++++ libsrc/D2LAppContext.php	(working copy)
+@@ -20,6 +20,7 @@
+ require_once 'D2LUserContext.php';
+ require_once 'UserOpSecurityParameters.php';
+ require_once 'D2LSigner.php';
++require_once 'D2LHostSpec.php';
+ 
+ /**
+  * D2LAppContext instances encapsulate a Desire2Learn LMS application security
+@@ -44,16 +45,34 @@
+         $this->_appKey = $appKey;
+     }
+ 
++	/* Wrapper for createUrlForAuthentication */
++	public function createUrlForAuthenticationFromHostSpec($hostSpec, $resultUri) {
++		assert($hostSpec->Scheme() == 'http' || $hostSpec->Scheme() == 'https');
++		$encryptOperations = ( $hostSpec->Scheme() == 'https' );
++		return $this->createUrlForAuthentication($hostSpec->Host(), $hostSpec->Port(), $resultUri, $encryptOperations);
++	}
++
+     /* Implements ID2LAppContext.createUrlForAuthentication(host,port,resultUri) */
+-    public function createUrlForAuthentication($host, $port, $resultUri) {
+-        $uri  = D2LConstants::URI_SECURE_SCHEME . '://' . $host;
+-        $uri .= ':' . $port;
++    public function createUrlForAuthentication($host, $port, $resultUri, $encryptOperations = true) {
++        if( $encryptOperations ) {
++			$uri  = D2LConstants::URI_SECURE_SCHEME . '://' . $host;
++        } else {
++			$uri = D2LConstants::URI_UNSECURE_SCHEME . '://' .$host;
++		}
++		$uri .= ':' . $port;
+         $uri .= D2LConstants::AUTHENTICATION_SERVICE_URI_PATH;
+         $uri .= '?' . $this->buildAuthenticationUriQueryString($resultUri);
+ 
+         return $uri;
+     }
+ 
++	/* Wrapper for createUserContext. */
++	public function createUserContextFromHostSpec($hostSpec, $userId = null, $userKey = null, $callbackUri = null) {
++		assert($hostSpec->Scheme() == 'http' || $hostSpec->Scheme() == 'https');
++		$encryptOperations = ($hostSpec->Scheme() == 'https');
++		return $this->createUserContext($hostSpec->Host(), $hostSpec->Port(), $encryptOperations, $userId, $userKey, $callbackUri);
++	}
++
+     /* Implements ID2LAppContext.createUserContext(host,port,encryptOperations,userId,userKey,callbackUri) */
+     public function createUserContext($hostName, $port, $encryptOperations, $userId = null, $userKey = null, $callbackUri = null) {
+         // If callback URI wasn't specified, take user ID and key as specified
