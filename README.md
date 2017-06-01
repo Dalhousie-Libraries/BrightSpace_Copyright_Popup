@@ -13,3 +13,5 @@ See COPYRIGHT_APP_README.docx
 This code is based upon an original project from Memorial University in St. John’s Newfoundland.  Our thanks to them for so generously sharing their work.
 
 Modified by Dalhousie University Libraries
+
+See UML diagram for application logic:  https://github.com/Dalhousie-Libraries/BrightSpace_Copyright_Popup/blob/master/copyright_popup.png
